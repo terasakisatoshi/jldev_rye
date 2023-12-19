@@ -1,0 +1,11 @@
+{
+    "julia": "1.6",
+    "packages": {
+        "JLRye": {
+            "uuid": "149abf33-12ee-440d-ac90-48263f4b5770",
+            "version": "0.1",
+            "path": "../../../",
+            "dev": true
+        }
+    }
+}

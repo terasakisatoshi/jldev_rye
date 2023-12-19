@@ -1,0 +1,46 @@
+[project]
+name = "jlrye"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Satoshi Terasaki", email = "terasakisatoshi.math@gmail.com" }
+]
+dependencies = [
+    "pandas>=2.1.4",
+    "pydantic>=2.5.2",
+    "juliacall>=0.9.15",
+    "matplotlib>=3.8.2",
+    "numpy>=1.26.2",
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+
+[project.scripts]
+hello="jlrye:hello"
+calljulia = "jlrye:jl_generate_points"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "black>=23.12.0",
+    "isort>=5.13.2",
+    "juliapkg>=0.1.10",
+    "ipython>=8.18.1",
+    "pytest>=7.4.3",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/python/jlrye"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "test",
+]

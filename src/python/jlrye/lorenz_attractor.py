@@ -3,8 +3,8 @@ Lorenz-Attractor
 https://docs.juliaplots.org/latest/user_gallery/misc/gr_lorenz_attractor/#Lorenz-Attractor
 """
 
-from pydantic import BaseModel
 import pandas as pd
+from pydantic import BaseModel
 
 
 class Lorenz(BaseModel):
@@ -17,20 +17,26 @@ class Lorenz(BaseModel):
     z: float = 1
 
     def step(self):
-        dx = self.σ * (self.y - self.x)
-        dy = self.x * (self.ρ - self.z) - self.y
-        dz = self.x * self.y - self.β * self.z
+        dx = self.sigma * (self.y - self.x)
+        dy = self.x * (self.rho - self.z) - self.y
+        dz = self.x * self.y - self.beta * self.z
         self.x += self.dt * dx
         self.y += self.dt * dy
         self.z += self.dt * dz
 
 
-def generate_points(attractor: Lorenz = Lorenz()):
-    df = pd.DataFrame(columns=["x", "y", "z"])
+def generate_points():
+    attractor = Lorenz()
+    xs = []
+    ys = []
+    zs = []
     for _ in range(500):
         attractor.step()
         x = attractor.x
         y = attractor.y
         z = attractor.z
-        df.append({"x": x, "y": y, "z": z})
+        xs.append(x)
+        ys.append(y)
+        zs.append(z)
+    df = pd.DataFrame({"x": xs, "y": ys, "z": zs})
     return df

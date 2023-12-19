@@ -21,9 +21,11 @@ function step!(l::Lorenz)
     l.x += l.dt * dx
     l.y += l.dt * dy
     l.z += l.dt * dz
+    return nothing
 end
 
-function generate_points(attractor::Lorenz=Lorenz())::DataFrame
+function generate_points()::DataFrame
+    attractor = Lorenz()
     df = DataFrame(:x => Float64[], :y => Float64[], :z => Float64[])
     for _ in 1:500
         step!(attractor)
@@ -31,8 +33,8 @@ function generate_points(attractor::Lorenz=Lorenz())::DataFrame
         y = attractor.y
         z = attractor.z
         push!(
-            df, 
-            Dict(:x=>x, :y => y, :z => z),
+            df,
+            Dict(:x => x, :y => y, :z => z),
         )
     end
     return df

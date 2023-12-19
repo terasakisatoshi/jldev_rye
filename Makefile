@@ -22,10 +22,11 @@ test: build
 	docker compose run --rm shell julia -e 'using Pkg; Pkg.activate("."); Pkg.test()'
 
 clean:
-	docker compose down
+	-docker compose down
 	-find $(CURDIR) -name "*.ipynb" -type f -delete
 	-find $(CURDIR) -name "*.html" -type f -delete
 	-find $(CURDIR) -name "*.gif" -type f -delete
 	-find $(CURDIR) -name "*.ipynb_checkpoints" -type d -exec rm -rf "{}" +
 	-rm -f  Manifest.toml docs/Manifest.toml
 	-rm -rf docs/build
+	-rm -rf .venv requirements.lock requirements-dev.lock

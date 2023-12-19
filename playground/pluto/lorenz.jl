@@ -6,8 +6,8 @@ using InteractiveUtils
 
 # ╔═╡ 4197c7d2-9e37-11ee-3675-bd4820351cb4
 begin
-	using Plots
-	using DataFrames
+    using Plots
+    using DataFrames
 end
 
 # ╔═╡ dcc3f853-4a9e-4598-9d26-ba25adda39bf
@@ -36,7 +36,7 @@ function step!(l::Lorenz)
     dz = l.x * l.y - l.β * l.z
     l.x += l.dt * dx
     l.y += l.dt * dy
-    l.z += l.dt * dz
+    return l.z += l.dt * dz
 end
 
 # ╔═╡ b596fd8a-851d-4d87-b231-6d68edbfb605
@@ -49,24 +49,24 @@ function generate_points()
         y = attractor.y
         z = attractor.z
         push!(
-			df, 
-			Dict(:x=>x, :y => y, :z => z),
-		)
+            df,
+            Dict(:x => x, :y => y, :z => z),
+        )
     end
     return df
 end
 
 # ╔═╡ 55cfb4da-2e15-4cdf-8030-476601dd818f
 let
-	df = generate_points()
-	(;x ,y, z) = df
-	
-	plot(
-		x, y, z,
-		title = "Lorenz Attractor",
-		legend=false,
-		marker=2,
-	)
+    df = generate_points()
+    (; x, y, z) = df
+
+    plot(
+        x, y, z;
+        title="Lorenz Attractor",
+        legend=false,
+        marker=2,
+    )
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001

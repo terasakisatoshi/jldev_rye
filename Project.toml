@@ -1,17 +1,18 @@
 name = "JLRye"
 uuid = "149abf33-12ee-440d-ac90-48263f4b5770"
 authors = ["Satoshi Terasaki <terasakisatoshi.math@gmail.com> and contributors"]
-version = "1.0.0-DEV"
+version = "0.1.0"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [compat]
 julia = "1.6.7"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "ReferenceTests"]
