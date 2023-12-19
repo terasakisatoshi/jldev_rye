@@ -1,4 +1,4 @@
-name: JuliaCI
+name: PythonCI
 on:
   push:
     branches:
