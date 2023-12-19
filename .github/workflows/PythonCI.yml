@@ -25,3 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: sksat/setup-rye@v0.10.0
+      - name: Run rye sync
+        run: rye sync
+      - name: Run rye run pytest
+        run: rye run pytest
