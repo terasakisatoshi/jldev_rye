@@ -29,6 +29,7 @@ symlink support: true
 $ git clone git@github.com:terasakisatoshi/jldev_rye.git
 $ cd jldev_rye
 $ rye sync
+$ julia --project -e 'using Pkg; Pkg.instantiate()'
 ```
 
 ### Run Python Script
