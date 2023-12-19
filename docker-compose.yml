@@ -1,0 +1,27 @@
+version: '3'
+services:
+  julia:
+    image: jlryejl
+    container_name: jlryejl-julia
+    volumes:
+      - ./:/workspace/JLRye.jl
+    working_dir: /workspace/JLRye.jl
+    command: julia --project=/workspace/JLRye.jl
+
+  shell:
+    image: jlryejl
+    container_name: jlryejl-julia
+    volumes:
+      - ./:/workspace/JLRye.jl
+    working_dir: /workspace/JLRye.jl
+    command: /bin/bash
+
+  web:
+    image: jlryejl
+    container_name: jlryejl-packagedocs
+    volumes:
+      - ./:/workspace/JLRye.jl
+    working_dir: /workspace/JLRye.jl
+    ports:
+      - "8000:8000"
+    command: make web
