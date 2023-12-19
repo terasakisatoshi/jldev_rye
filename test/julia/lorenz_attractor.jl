@@ -1,4 +1,7 @@
 using JLRye: Lorenz, generate_points
+using JLRye: jlrye
+using DataFrames
+using PythonCall: PyTable
 
 @testset "Lorenz init" begin
     attractor = Lorenz()
@@ -18,3 +21,13 @@ end
     @test_reference "references/lorenz_y.txt" df.y
     @test_reference "references/lorenz_z.txt" df.z
 end
+
+@testset "Python.generate_points" begin
+    pydf = jlrye.generate_points()
+    df = DataFrame(PyTable(pydf))
+    @test size(df) == (500, 3)
+    @test_reference "references/lorenz_x.txt" df.x
+    @test_reference "references/lorenz_y.txt" df.y
+    @test_reference "references/lorenz_z.txt" df.z
+end
+
