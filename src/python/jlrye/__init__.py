@@ -1,4 +1,4 @@
-import pandas as pd
+from jlrye.lorenz_attractor import Lorenz, generate_points
 
 
 def hello():
