@@ -10,7 +10,6 @@
 - Install `rye`
   - Please follow [the instructions](https://rye-up.com/guide/installation/).
 
-
 Here is an output from my machine
 
 ```console
@@ -30,7 +29,22 @@ symlink support: true
 $ git clone git@github.com:terasakisatoshi/jldev_rye.git
 $ cd jldev_rye
 $ rye sync
-$ julia --project -e 'using Pkg; Pkg.instantiate()'
+```
+
+### Run Python Script
+
+Assuming you want to run `file.py`, please use the following command:
+
+```console
+$ rye run python file.py
+```
+
+### Run Julia Script
+
+Assuming you want to run `file.jl`, please use the following command:
+
+```console
+$ julia --project file.jl
 ```
 
 That's it. Go on to the next section.
@@ -76,6 +90,7 @@ plt.show()
 
 ```python
 from matplotlib import pyplot as plt
+import juliacall
 
 from jlrye.julia_interface import JLRye
 jldf = JLRye.generate_points()
