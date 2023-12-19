@@ -8,3 +8,7 @@
 /docs/build/
 docs/build/
 docs/site/
+
+__pycache__
+default.profraw
+
