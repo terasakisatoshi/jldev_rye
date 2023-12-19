@@ -6,7 +6,34 @@
 ## Prerequisites
 
 - Install Julia
+  - It is a good idea to use [juliaup](https://github.com/JuliaLang/juliaup).
 - Install `rye`
+  - Please follow [the instructions](https://rye-up.com/guide/installation/).
+
+
+Here is an output from my machine
+
+```console
+$ julia --version
+julia version 1.9.4
+$ rye --version
+rye 0.16.0
+commit: 0.16.0 (c003223d5 2023-12-16)
+platform: macos (x86_64)
+self-python: cpython@3.11
+symlink support: true
+```
+
+## Setup this project
+
+```console
+$ git clone git@github.com:terasakisatoshi/jldev_rye.git
+$ cd jldev_rye
+$ rye sync
+$ julia --project -e 'using Pkg; Pkg.instantiate()'
+```
+
+That's it. Go on to the next section.
 
 ## Plot Lorenz Attractor
 
@@ -32,7 +59,7 @@ df = JLRye.generate_points()
 @df df plot3d(:x, :y, :z, marker=2, legend=false, title="Lorenz Attractor")
 ```
 
-If you are Pythonista, you may want to run the following script:
+If you are a Pythonista, you may want to run the following script:
 
 ```julia
 using PythonPlot: pyplot as plt
