@@ -1,7 +1,7 @@
 module JLRye
 
 # Write your package code here.
-using DataFrames: Frame
+using DataFrames: DataFrame
 include("julia/lorenz_attractor.jl")
 
 end

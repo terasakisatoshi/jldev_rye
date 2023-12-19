@@ -1,4 +1,7 @@
-#Lorenz-Attractor
+#=
+Lorenz-Attractor
+https://docs.juliaplots.org/latest/user_gallery/misc/gr_lorenz_attractor/#Lorenz-Attractor
+=#
 
 # define the Lorenz attractor
 Base.@kwdef mutable struct Lorenz
@@ -20,8 +23,7 @@ function step!(l::Lorenz)
     l.z += l.dt * dz
 end
 
-function generate_points()
-    attractor = Lorenz()
+function generate_points(attractor::Lorenz=Lorenz())::DataFrame
     df = DataFrame(:x => Float64[], :y => Float64[], :z => Float64[])
     for _ in 1:500
         step!(attractor)
