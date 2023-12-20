@@ -43,7 +43,7 @@ end
 function generate_points()
     attractor = Lorenz()
     df = DataFrame(:x => Float64[], :y => Float64[], :z => Float64[])
-    for _ in 1:500
+    for _ in 1:1500
         step!(attractor)
         x = attractor.x
         y = attractor.y
