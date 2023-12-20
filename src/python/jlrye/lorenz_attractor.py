@@ -30,7 +30,7 @@ def generate_points():
     xs = []
     ys = []
     zs = []
-    for _ in range(500):
+    for _ in range(1500):
         attractor.step()
         x = attractor.x
         y = attractor.y
