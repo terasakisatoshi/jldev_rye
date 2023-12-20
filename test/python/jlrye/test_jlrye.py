@@ -15,11 +15,11 @@ def test_Lorenz_attractor():
 
 def test_py_generate_points():
     df = generate_points()
-    assert df.shape == (500, 3)
+    assert df.shape == (1500, 3)
 
 def test_jl_generate_points():
     df = jl_generate_points()
-    assert df.shape == (500, 3)
+    assert df.shape == (1500, 3)
 
 def test_generate_points():
     ref = jl_generate_points()

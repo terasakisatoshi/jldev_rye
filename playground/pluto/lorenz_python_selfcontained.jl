@@ -4,80 +4,104 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 4197c7d2-9e37-11ee-3675-bd4820351cb4
+# ╔═╡ bdfab89a-a72e-4aca-a91d-348f06aea72d
 begin
-    using Plots
-    using DataFrames
+	using CondaPkg
+	using DataFrames
+	using Plots
+	using PythonCall
 end
 
-# ╔═╡ dcc3f853-4a9e-4598-9d26-ba25adda39bf
-md"""
-Inspired by [Plots.jl gallery](https://docs.juliaplots.org/latest/user_gallery/misc/gr_lorenz_attractor/#Lorenz-Attractor)
-"""
-
-# ╔═╡ 34cc3078-033b-4469-8bca-ef3349ef0972
-#Lorenz-Attractor
-
-# define the Lorenz attractor
-Base.@kwdef mutable struct Lorenz
-    dt::Float64 = 0.02
-    σ::Float64 = 10
-    ρ::Float64 = 28
-    β::Float64 = 8 / 3
-    x::Float64 = 1
-    y::Float64 = 1
-    z::Float64 = 1
+# ╔═╡ 79adff91-1da7-4366-81ba-3c0039b02ff5
+begin
+	CondaPkg.add_pip("pandas")
+	CondaPkg.add_pip("pydantic")
 end
 
-# ╔═╡ d758d5f1-be0c-4106-9452-9da0cee29d44
-function step!(l::Lorenz)
-    dx = l.σ * (l.y - l.x)
-    dy = l.x * (l.ρ - l.z) - l.y
-    dz = l.x * l.y - l.β * l.z
-    l.x += l.dt * dx
-    l.y += l.dt * dy
-    return l.z += l.dt * dz
-end
+# ╔═╡ 4d7e216e-082e-4b67-be93-56ba3a616ed0
+# Edit Python script
+my_python_script = raw"""
+import pandas as pd
+from pydantic import BaseModel
 
-# ╔═╡ b596fd8a-851d-4d87-b231-6d68edbfb605
-function generate_points()
+class Lorenz(BaseModel):
+    dt: float = 0.02
+    sigma: float = 10
+    rho: float = 28
+    beta: float = 8 / 3
+    x: float = 1
+    y: float = 1
+    z: float = 1
+
+    def step(self):
+        dx = self.sigma * (self.y - self.x)
+        dy = self.x * (self.rho - self.z) - self.y
+        dz = self.x * self.y - self.beta * self.z
+        self.x += self.dt * dx
+        self.y += self.dt * dy
+        self.z += self.dt * dz
+
+def generate_points():
     attractor = Lorenz()
-    df = DataFrame(:x => Float64[], :y => Float64[], :z => Float64[])
-    for _ in 1:1500
-        step!(attractor)
+    xs = []
+    ys = []
+    zs = []
+    for _ in range(1500):
+        attractor.step()
         x = attractor.x
         y = attractor.y
         z = attractor.z
-        push!(
-            df,
-            Dict(:x => x, :y => y, :z => z),
-        )
-    end
+        xs.append(x)
+        ys.append(y)
+        zs.append(z)
+    df = pd.DataFrame({"x": xs, "y": ys, "z": zs})
     return df
-end
+""";
 
-# ╔═╡ 55cfb4da-2e15-4cdf-8030-476601dd818f
+# ╔═╡ 3f67dfbf-2bb6-42eb-b64e-1e803eab4690
+mylib = mktempdir() do d
+	open(joinpath(d, "mylib.py"), "w") do io
+		print(io, my_python_script)
+	end
+	pyimport("sys").path.append(d)
+	pyimport("mylib")
+end;
+
+# ╔═╡ a99d6018-6842-403d-a265-8170a9ecc858
 let
-    df = generate_points()
-    (; x, y, z) = df
-
-    plot(
-        x, y, z;
-        title="Lorenz Attractor",
-        legend=false,
-        marker=2,
-    )
+	pydf = mylib.generate_points()
+	df = DataFrame(PyTable(pydf))
+	# initialize a 3D plot with 1 empty series
+	plt = plot3d(
+		1,
+	    xlim = (-30, 30),
+	    ylim = (-30, 30),
+	    zlim = (0, 60),
+	    title = "Lorenz Attractor",
+	    legend = false,
+	    marker = 2,
+	)
+	# build an animated gif by pushing new points to the plot, saving every 10th frame
+	# equivalently, you can use `@gif` to replace `@animate` and thus no need to explicitly call `gif(anim)`.
+	anim = @animate for i in eachindex(df.x, df.y, df.z)
+	    push!(plt, df.x[i], df.y[i], df.z[i])
+	end every 10
+	gif(anim)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [compat]
+CondaPkg = "~0.2.22"
 DataFrames = "~1.6.1"
 Plots = "~1.39.0"
+PythonCall = "~0.9.15"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -86,7 +110,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.9.4"
 manifest_format = "2.0"
-project_hash = "36ad8d641202602ef39bc9dafc8b93cd2853fc70"
+project_hash = "1bc835c3db09d7e1a1eaf2424caf0ac05b5168b5"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
@@ -171,6 +195,12 @@ deps = ["Serialization", "Sockets"]
 git-tree-sha1 = "8cfa272e8bdedfa88b6aefbbca7c19f1befac519"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
 version = "2.3.0"
+
+[[deps.CondaPkg]]
+deps = ["JSON3", "Markdown", "MicroMamba", "Pidfile", "Pkg", "Preferences", "TOML"]
+git-tree-sha1 = "e81c4263c7ef4eca4d645ef612814d72e9255b41"
+uuid = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
+version = "0.2.22"
 
 [[deps.Contour]]
 git-tree-sha1 = "d05d9e7b7aedff4e5b51a029dced05cfb6125781"
@@ -388,6 +418,18 @@ git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
 
+[[deps.JSON3]]
+deps = ["Dates", "Mmap", "Parsers", "PrecompileTools", "StructTypes", "UUIDs"]
+git-tree-sha1 = "eb3edce0ed4fa32f75a0a11217433c31d56bd48b"
+uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+version = "1.14.0"
+
+    [deps.JSON3.extensions]
+    JSON3ArrowExt = ["ArrowTypes"]
+
+    [deps.JSON3.weakdeps]
+    ArrowTypes = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
+
 [[deps.JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "60b1194df0a3298f460063de985eae7b01bc011a"
@@ -436,6 +478,10 @@ version = "0.16.1"
     [deps.Latexify.weakdeps]
     DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
     SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LazyArtifacts]]
+deps = ["Artifacts", "Pkg"]
+uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -538,9 +584,9 @@ version = "1.0.3"
 
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
-git-tree-sha1 = "9ee1618cbf5240e6d4e0371d6f24065083f60c48"
+git-tree-sha1 = "b211c553c199c111d998ecdaf7623d1b89b69f93"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
-version = "0.5.11"
+version = "0.5.12"
 
 [[deps.Markdown]]
 deps = ["Base64"]
@@ -561,6 +607,12 @@ version = "2.28.2+0"
 git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
 uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
 version = "0.3.2"
+
+[[deps.MicroMamba]]
+deps = ["Pkg", "Scratch", "micromamba_jll"]
+git-tree-sha1 = "011cab361eae7bcd7d278f0a7a00ff9c69000c51"
+uuid = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
+version = "0.1.14"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
@@ -634,6 +686,12 @@ deps = ["Dates", "PrecompileTools", "UUIDs"]
 git-tree-sha1 = "a935806434c9d4c506ba941871b327b96d41f2bf"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.8.0"
+
+[[deps.Pidfile]]
+deps = ["FileWatching", "Test"]
+git-tree-sha1 = "2d8aaf8ee10df53d0dfb9b8ee44ae7c04ced2b03"
+uuid = "fa939f87-e72e-5be4-a000-7fc836dbe307"
+version = "1.3.0"
 
 [[deps.Pipe]]
 git-tree-sha1 = "6842804e7867b115ca9de748a0cf6b364523c16d"
@@ -710,6 +768,12 @@ version = "2.3.1"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[deps.PythonCall]]
+deps = ["CondaPkg", "Dates", "Libdl", "MacroTools", "Markdown", "Pkg", "REPL", "Requires", "Serialization", "Tables", "UnsafePointers"]
+git-tree-sha1 = "4999b3e4e9bdeba0b61ede19cc45a2128db21cdc"
+uuid = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+version = "0.9.15"
 
 [[deps.Qt6Base_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Fontconfig_jll", "Glib_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "OpenSSL_jll", "Vulkan_Loader_jll", "Xorg_libSM_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Xorg_libxcb_jll", "Xorg_xcb_util_cursor_jll", "Xorg_xcb_util_image_jll", "Xorg_xcb_util_keysyms_jll", "Xorg_xcb_util_renderutil_jll", "Xorg_xcb_util_wm_jll", "Zlib_jll", "libinput_jll", "xkbcommon_jll"]
@@ -820,6 +884,12 @@ git-tree-sha1 = "a04cabe79c5f01f4d723cc6704070ada0b9d46d5"
 uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
 version = "0.3.4"
 
+[[deps.StructTypes]]
+deps = ["Dates", "UUIDs"]
+git-tree-sha1 = "ca4bccb03acf9faaf4137a9abc1881ed1841aa70"
+uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+version = "1.10.0"
+
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "Pkg", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
@@ -903,6 +973,11 @@ deps = ["LaTeXStrings", "Latexify", "Unitful"]
 git-tree-sha1 = "e2d817cc500e960fdbafcf988ac8436ba3208bfd"
 uuid = "45397f5d-5981-4c77-b2b3-fc36d6e9b728"
 version = "1.6.3"
+
+[[deps.UnsafePointers]]
+git-tree-sha1 = "c81331b3b2e60a982be57c046ec91f599ede674a"
+uuid = "e17b2a0c-0bdf-430a-bd0c-3a23cae4ff39"
+version = "1.0.0"
 
 [[deps.Unzip]]
 git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
@@ -1165,6 +1240,12 @@ git-tree-sha1 = "b910cb81ef3fe6e78bf6acee440bda86fd6ae00c"
 uuid = "f27f6e37-5d2b-51aa-960f-b287f2bc3b7a"
 version = "1.3.7+1"
 
+[[deps.micromamba_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "66d07957bcf7e4930d933195aed484078dd8cbb5"
+uuid = "f8abcde7-e9b7-5caa-b8af-a437887ae8e4"
+version = "1.4.9+0"
+
 [[deps.mtdev_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "814e154bdb7be91d78b6802843f76b6ece642f11"
@@ -1201,11 +1282,10 @@ version = "1.4.1+1"
 """
 
 # ╔═╡ Cell order:
-# ╠═4197c7d2-9e37-11ee-3675-bd4820351cb4
-# ╟─dcc3f853-4a9e-4598-9d26-ba25adda39bf
-# ╠═34cc3078-033b-4469-8bca-ef3349ef0972
-# ╠═d758d5f1-be0c-4106-9452-9da0cee29d44
-# ╠═b596fd8a-851d-4d87-b231-6d68edbfb605
-# ╠═55cfb4da-2e15-4cdf-8030-476601dd818f
+# ╠═bdfab89a-a72e-4aca-a91d-348f06aea72d
+# ╠═79adff91-1da7-4366-81ba-3c0039b02ff5
+# ╠═4d7e216e-082e-4b67-be93-56ba3a616ed0
+# ╠═3f67dfbf-2bb6-42eb-b64e-1e803eab4690
+# ╠═a99d6018-6842-403d-a265-8170a9ecc858
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
