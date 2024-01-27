@@ -1,16 +1,14 @@
-using JLRye
 using Documenter
+using JLRye
 
 DocMeta.setdocmeta!(JLRye, :DocTestSetup, :(using JLRye); recursive=true)
 
 makedocs(;
     modules=[JLRye],
     authors="Satoshi Terasaki <terasakisatoshi.math@gmail.com> and contributors",
-    repo="https://github.com/terasakisatoshi/JLRye.jl/blob/{commit}{path}#{line}",
     sitename="JLRye.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://terasakisatoshi.github.io/JLRye.jl",
+        canonical="https://github.com/AtelierArith/PkgBump.jl",
         edit_link="main",
         assets=String[],
     ),
