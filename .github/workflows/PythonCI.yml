@@ -24,6 +24,10 @@ jobs:
           - x64
     steps:
       - uses: actions/checkout@v4
+      - name: Install uv
+        - run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          rye config --set-bool behavior.use-uv=true`
       - uses: sksat/setup-rye@v0.12.0
       - name: Run rye sync
         run: rye sync
