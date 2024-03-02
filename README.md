@@ -9,12 +9,24 @@
   - It is a good idea to use [juliaup](https://github.com/JuliaLang/juliaup).
 - Install `rye`
   - Please follow [the instructions](https://rye-up.com/guide/installation/).
+- Optionally, you can install [uv](https://github.com/astral-sh/uv) which is an extremely fast Python package installer and resolver, written in Rust.
+
+```
+$ curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+and run the following command to set uv as a backend.
+
+```
+$ rye config --set-bool behavior.use-uv=true`
+```
+
 
 Here is an output from my machine
 
 ```console
 $ julia --version
-julia version 1.9.4
+julia version 1.10.2
 $ rye --version
 rye 0.16.0
 commit: 0.16.0 (c003223d5 2023-12-16)
@@ -29,7 +41,7 @@ symlink support: true
 $ git clone git@github.com:terasakisatoshi/jldev_rye.git
 $ cd jldev_rye
 $ rye sync
-$ julia --project -e 'using Pkg; Pkg.instantiate()'
+$ julia --project -e 'using Pkg; Pkg.instantiate()
 ```
 
 ### Run Python Script
