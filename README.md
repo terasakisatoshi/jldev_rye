@@ -18,7 +18,7 @@ $ curl -LsSf https://astral.sh/uv/install.sh | sh
 and run the following command to set uv as a backend.
 
 ```
-$ rye config --set-bool behavior.use-uv=true`
+$ rye config --set-bool behavior.use-uv=true
 ```
 
 
