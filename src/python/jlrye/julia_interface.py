@@ -6,10 +6,8 @@ jl.seval("using JLRye")
 
 JLRye = jl.JLRye
 
+
 def jl_generate_points() -> pd.DataFrame:
     jldf = JLRye.generate_points()
     pydf = juliacall.PythonCall.pytable(jldf)
     return pydf
-
-
-
