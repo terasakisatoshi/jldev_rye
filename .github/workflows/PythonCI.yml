@@ -27,7 +27,7 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-      - uses: sksat/setup-rye@v0.26.0
+      - uses: sksat/setup-rye@v0.27.0
       - name: Run rye config
         run: rye config --set-bool behavior.use-uv=true
       - name: Run rye sync
